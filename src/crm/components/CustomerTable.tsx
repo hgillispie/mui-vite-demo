@@ -28,12 +28,22 @@ import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import { Customer } from "../types/Customer";
 
+/**
+ * Props interface for the CustomerTable component
+ * Handles the display and interaction of customer data in a DataGrid format
+ */
 interface CustomerTableProps {
+  /** Array of customer objects to display in the table */
   customers: Customer[];
+  /** Boolean flag indicating if data is currently being fetched from the API */
   loading: boolean;
+  /** Error message string if API request failed, null if no error */
   error: string | null;
+  /** Total number of customers available on the server (for pagination) */
   total: number;
+  /** Current page number (1-based indexing) */
   page: number;
+  /** Number of items to display per page */
   perPage: number;
   search: string;
   onSearchChange: (search: string) => void;
