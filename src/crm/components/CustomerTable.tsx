@@ -45,12 +45,19 @@ interface CustomerTableProps {
   page: number;
   /** Number of items to display per page */
   perPage: number;
+  /** Current search query string for filtering customers */
   search: string;
+  /** Callback function triggered when user changes the search input */
   onSearchChange: (search: string) => void;
+  /** Callback function triggered when user navigates to a different page */
   onPageChange: (page: number) => void;
+  /** Callback function triggered when user changes the page size */
   onPageSizeChange: (pageSize: number) => void;
+  /** Callback function triggered when user sorts by a column (receives API sort field name) */
   onSortChange: (sortBy: string) => void;
+  /** Callback function triggered when user clicks edit button for a customer */
   onEditCustomer: (customer: Customer) => void;
+  /** Callback function triggered when user clicks delete button for a customer */
   onDeleteCustomer: (customer: Customer) => void;
 }
 
