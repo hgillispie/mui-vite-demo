@@ -201,6 +201,7 @@ export default function UsersDataGrid({ onEditUser, onDeleteUser }: UsersDataGri
       minWidth: 120,
       valueGetter: (params) => {
         const user = params.row as User;
+        if (!user || !user.registered) return "";
         return formatDate(user.registered.date);
       },
     },
