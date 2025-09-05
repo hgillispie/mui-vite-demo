@@ -119,10 +119,12 @@ export default function UsersDataGrid({ onEditUser, onDeleteUser }: UsersDataGri
       });
       
       // Convert users to have an id field for DataGrid
-      const usersWithIds = response.data.map((user) => ({
-        ...user,
-        id: user.login.uuid,
-      }));
+      const usersWithIds = response.data
+        .filter((user) => user && user.login && user.login.uuid) // Filter out invalid users
+        .map((user) => ({
+          ...user,
+          id: user.login.uuid,
+        }));
       
       setUsers(usersWithIds);
       setTotalRows(response.total);
