@@ -22,9 +22,14 @@ interface UsersDataGridProps {
 // Render avatar for user
 function renderUserAvatar(params: GridCellParams<User>) {
   const user = params.row as User;
+
+  if (!user || !user.name) {
+    return null;
+  }
+
   const fullName = `${user.name.first} ${user.name.last}`;
   const initials = `${user.name.first.charAt(0)}${user.name.last.charAt(0)}`.toUpperCase();
-  
+
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       <Avatar
