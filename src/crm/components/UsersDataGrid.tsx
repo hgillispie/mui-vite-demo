@@ -173,6 +173,7 @@ export default function UsersDataGrid({ onEditUser, onDeleteUser }: UsersDataGri
       flex: 1,
       minWidth: 150,
       valueGetter: (params) => {
+        if (!params || !params.row) return "";
         const user = params.row as User;
         if (!user || !user.location) return "";
         return `${user.location.city}, ${user.location.country}`;
@@ -193,6 +194,7 @@ export default function UsersDataGrid({ onEditUser, onDeleteUser }: UsersDataGri
       align: "center",
       headerAlign: "center",
       valueGetter: (params) => {
+        if (!params || !params.row) return "";
         const user = params.row as User;
         if (!user || !user.dob) return "";
         return user.dob.age;
@@ -212,6 +214,7 @@ export default function UsersDataGrid({ onEditUser, onDeleteUser }: UsersDataGri
       flex: 1,
       minWidth: 120,
       valueGetter: (params) => {
+        if (!params || !params.row) return "";
         const user = params.row as User;
         if (!user || !user.registered) return "";
         return formatDate(user.registered.date);
