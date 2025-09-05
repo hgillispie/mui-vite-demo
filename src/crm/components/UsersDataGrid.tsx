@@ -21,6 +21,10 @@ interface UsersDataGridProps {
 
 // Render avatar for user
 function renderUserAvatar(params: GridCellParams<User>) {
+  if (!params || !params.row) {
+    return null;
+  }
+
   const user = params.row as User;
 
   if (!user || !user.name) {
@@ -53,6 +57,10 @@ function renderUserAvatar(params: GridCellParams<User>) {
 
 // Render status based on registration age
 function renderUserStatus(params: GridCellParams<User>) {
+  if (!params || !params.row) {
+    return null;
+  }
+
   const user = params.row as User;
 
   if (!user || !user.registered) {
@@ -226,6 +234,8 @@ export default function UsersDataGrid({ onEditUser, onDeleteUser }: UsersDataGri
       headerName: "Actions",
       width: 100,
       getActions: (params) => {
+        if (!params || !params.row) return [];
+
         const user = params.row as User;
         if (!user || !user.login) return [];
 
