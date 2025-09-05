@@ -122,7 +122,7 @@ export default function Customers() {
       {/* Header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
         <Box>
-          <Typography variant="h4" component="h1" sx={{ mb: 1 }}>
+          <Typography variant="h4" component="h1" sx={{ mb: 1, fontWeight: 700 }}>
             Customer Dashboard
           </Typography>
           <Typography variant="body1" color="text.secondary">
@@ -145,7 +145,7 @@ export default function Customers() {
                 <Box
                   sx={{
                     p: 1,
-                    backgroundColor: "primary.main",
+                    backgroundColor: "rgba(48, 109, 171, 1)",
                     borderRadius: 1,
                     color: "white",
                   }}
