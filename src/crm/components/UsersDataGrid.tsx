@@ -222,20 +222,25 @@ export default function UsersDataGrid({ onEditUser, onDeleteUser }: UsersDataGri
       type: "actions",
       headerName: "Actions",
       width: 100,
-      getActions: (params) => [
-        <GridActionsCellItem
-          key="edit"
-          icon={<EditIcon />}
-          label="Edit"
-          onClick={() => handleEditUser(params.row as User)}
-        />,
-        <GridActionsCellItem
-          key="delete"
-          icon={<DeleteIcon />}
-          label="Delete"
-          onClick={() => handleDeleteUser(params.row as User)}
-        />,
-      ],
+      getActions: (params) => {
+        const user = params.row as User;
+        if (!user || !user.login) return [];
+
+        return [
+          <GridActionsCellItem
+            key="edit"
+            icon={<EditIcon />}
+            label="Edit"
+            onClick={() => handleEditUser(user)}
+          />,
+          <GridActionsCellItem
+            key="delete"
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={() => handleDeleteUser(user)}
+          />,
+        ];
+      },
     },
   ];
 
