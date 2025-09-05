@@ -162,6 +162,7 @@ export default function UsersDataGrid({ onEditUser, onDeleteUser }: UsersDataGri
       minWidth: 150,
       valueGetter: (params) => {
         const user = params.row as User;
+        if (!user || !user.location) return "";
         return `${user.location.city}, ${user.location.country}`;
       },
       sortable: false,
