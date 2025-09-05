@@ -54,22 +54,27 @@ function renderUserAvatar(params: GridCellParams<User>) {
 // Render status based on registration age
 function renderUserStatus(params: GridCellParams<User>) {
   const user = params.row as User;
+
+  if (!user || !user.registered) {
+    return null;
+  }
+
   const registrationAge = user.registered.age;
-  
+
   let status: "New" | "Active" | "Veteran";
   let color: "info" | "success" | "warning";
-  
+
   if (registrationAge < 1) {
     status = "New";
     color = "info";
   } else if (registrationAge < 3) {
-    status = "Active"; 
+    status = "Active";
     color = "success";
   } else {
     status = "Veteran";
     color = "warning";
   }
-  
+
   return <Chip label={status} color={color} size="small" variant="outlined" />;
 }
 
