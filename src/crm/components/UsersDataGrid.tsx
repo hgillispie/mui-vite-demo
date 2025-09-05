@@ -182,6 +182,7 @@ export default function UsersDataGrid({ onEditUser, onDeleteUser }: UsersDataGri
       headerAlign: "center",
       valueGetter: (params) => {
         const user = params.row as User;
+        if (!user || !user.dob) return "";
         return user.dob.age;
       },
     },
