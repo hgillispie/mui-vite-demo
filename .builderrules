@@ -1,4 +1,4 @@
-Make sure when generating with MUI components look at the examples in src/* for correct usage of this code on the specific MUI versions we use and patterns we want to replicate. DONT USE GRID2
+Make sure when generating with MUI components look at the examples in src/* for correct usage of this code on the specific MUI versions we use and patterns we want to replicate. DONT USE GRID2 or any of the mui/x- components 
 
 When doing any thing with user data, use this internal API of ours:
 
