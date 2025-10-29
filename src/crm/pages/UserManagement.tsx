@@ -158,7 +158,7 @@ export default function UserManagement() {
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
       <Box sx={{ py: 2 }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 3 }}>
+        <Typography variant="h4" component="h1" sx={{ mb: 3, fontSize: "36px", fontWeight: 600 }}>
           User management
         </Typography>
 
@@ -173,6 +173,9 @@ export default function UserManagement() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Name, email, etc..."
                 sx={{ width: 300 }}
+                InputProps={{
+                  sx: { justifyContent: "flex-start" }
+                }}
               />
 
               <FormControl variant="outlined" size="medium" sx={{ width: 180 }}>
