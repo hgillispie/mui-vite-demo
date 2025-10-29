@@ -176,7 +176,7 @@ export default function Customers() {
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
       <Stack spacing={3}>
         <Stack>
-          <Typography variant="h4" component="h1" sx={{ mb: 1, fontWeight: 600 }}>
+          <Typography variant="h4" component="h1" sx={{ mb: 1, fontWeight: 600, fontSize: "36px", color: "rgba(144, 19, 254, 1)" }}>
             Customers
           </Typography>
           <Typography variant="body2" color="text.secondary">
