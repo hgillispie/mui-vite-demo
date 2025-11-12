@@ -8,16 +8,22 @@ import { alpha } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
+// CRM Layout Components
 import CrmAppNavbar from "./components/CrmAppNavbar";
 import CrmHeader from "./components/CrmHeader";
 import CrmSideMenu from "./components/CrmSideMenu";
 import CrmMainDashboard from "./components/CrmMainDashboard";
+
+// CRM Page Components - Main application views accessible through navigation
 import Customers from "./pages/Customers";
 import Deals from "./pages/Deals";
 import Contacts from "./pages/Contacts";
 import Tasks from "./pages/Tasks";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+// Users management page - provides comprehensive user administration interface
+// with search, filtering, sorting, and pagination capabilities connected to the Users API
+import Users from "./pages/Users";
 import AppTheme from "../shared-theme/AppTheme";
 import {
   chartsCustomizations,
@@ -69,6 +75,7 @@ export default function CrmDashboard() {
               <Route path="tasks" element={<Tasks />} />
               <Route path="reports" element={<Reports />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="users" element={<Users />} />
             </Routes>
             <Outlet />
           </Stack>
