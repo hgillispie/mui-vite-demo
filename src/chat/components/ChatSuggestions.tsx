@@ -11,7 +11,7 @@ interface ChatSuggestionsProps {
 }
 
 const suggestions = [
-  "Generate unit tests for the following C# function",
+  "Show me a summary of our current sales metrics and top performing customers",
   "Help with SQL to generate a report",
   "Teach me the concept of game theory in simple terms",
   "Walk me through how to apply for a new role",
