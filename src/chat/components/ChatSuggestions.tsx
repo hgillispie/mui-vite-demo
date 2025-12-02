@@ -12,9 +12,9 @@ interface ChatSuggestionsProps {
 
 const suggestions = [
   "Show me a summary of our current sales metrics and top performing customers",
-  "Help with SQL to generate a report",
-  "Teach me the concept of game theory in simple terms",
-  "Walk me through how to apply for a new role",
+  "Which deals are closing soon and what's their status?",
+  "What are the top risks in our current pipeline?",
+  "Show me my priorities for today",
 ];
 
 export default function ChatSuggestions({
