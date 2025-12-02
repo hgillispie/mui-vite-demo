@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useLocation } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
@@ -10,6 +11,17 @@ import Button from "@mui/material/Button";
 import CalendarTodayRoundedIcon from "@mui/icons-material/CalendarTodayRounded";
 
 export default function CrmHeader() {
+  const location = useLocation();
+
+  const getPageTitle = () => {
+    switch (location.pathname) {
+      case "/chat":
+        return "AI Assistant";
+      default:
+        return "CRM Dashboard";
+    }
+  };
+
   return (
     <Stack
       direction="row"
@@ -26,7 +38,7 @@ export default function CrmHeader() {
       <Stack direction="column" spacing={1}>
         <CrmNavbarBreadcrumbs />
         <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
-          CRM Dashboard
+          {getPageTitle()}
         </Typography>
       </Stack>
       <Stack direction="row" sx={{ gap: 1 }}>

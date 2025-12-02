@@ -18,6 +18,7 @@ import Contacts from "./pages/Contacts";
 import Tasks from "./pages/Tasks";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import ChatBot from "../chat/ChatBot";
 import AppTheme from "../shared-theme/AppTheme";
 import {
   chartsCustomizations,
@@ -51,27 +52,42 @@ export default function CrmDashboard() {
             overflow: "auto",
           })}
         >
-          <Stack
-            spacing={2}
-            sx={{
-              alignItems: "center",
-              mx: 3,
-              pb: 5,
-              mt: { xs: 8, md: 0 },
-            }}
-          >
-            <CrmHeader />
-            <Routes>
-              <Route index element={<CrmMainDashboard />} />
-              <Route path="customers" element={<Customers />} />
-              <Route path="deals" element={<Deals />} />
-              <Route path="contacts" element={<Contacts />} />
-              <Route path="tasks" element={<Tasks />} />
-              <Route path="reports" element={<Reports />} />
-              <Route path="settings" element={<Settings />} />
-            </Routes>
-            <Outlet />
-          </Stack>
+          <Routes>
+            <Route
+              path="chat"
+              element={
+                <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", mt: { xs: 8, md: 0 } }}>
+                  <ChatBot />
+                </Box>
+              }
+            />
+            <Route
+              path="*"
+              element={
+                <Stack
+                  spacing={2}
+                  sx={{
+                    alignItems: "center",
+                    mx: 3,
+                    pb: 5,
+                    mt: { xs: 8, md: 0 },
+                  }}
+                >
+                  <CrmHeader />
+                  <Routes>
+                    <Route index element={<CrmMainDashboard />} />
+                    <Route path="customers" element={<Customers />} />
+                    <Route path="deals" element={<Deals />} />
+                    <Route path="contacts" element={<Contacts />} />
+                    <Route path="tasks" element={<Tasks />} />
+                    <Route path="reports" element={<Reports />} />
+                    <Route path="settings" element={<Settings />} />
+                  </Routes>
+                  <Outlet />
+                </Stack>
+              }
+            />
+          </Routes>
         </Box>
       </Box>
     </AppTheme>
