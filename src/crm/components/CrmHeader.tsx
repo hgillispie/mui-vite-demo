@@ -2,14 +2,30 @@ import * as React from "react";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
+import PrintIcon from "@mui/icons-material/Print";
 import MenuButton from "../../dashboard/components/MenuButton";
 import ColorModeIconDropdown from "../../shared-theme/ColorModeIconDropdown";
 import CrmSearch from "./CrmSearch";
 import CrmNavbarBreadcrumbs from "./CrmNavbarBreadcrumbs";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
 import CalendarTodayRoundedIcon from "@mui/icons-material/CalendarTodayRounded";
+import PrintPreviewModal from "./PrintPreviewModal";
 
 export default function CrmHeader() {
+  const [printOpen, setPrintOpen] = React.useState(false);
+  const [printContent, setPrintContent] = React.useState<string>("");
+  const [pageTitle, setPageTitle] = React.useState("CRM App");
+
+  const handlePrintClick = () => {
+    const mainContent = document.querySelector("main");
+    if (mainContent) {
+      const clonedContent = mainContent.cloneNode(true) as HTMLElement;
+      clonedContent.style.display = "block";
+      setPrintContent(clonedContent.innerHTML);
+      setPrintOpen(true);
+    }
+  };
   return (
     <Stack
       direction="row"
