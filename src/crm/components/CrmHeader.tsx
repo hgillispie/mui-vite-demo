@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useLocation } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
@@ -12,10 +13,27 @@ import IconButton from "@mui/material/IconButton";
 import CalendarTodayRoundedIcon from "@mui/icons-material/CalendarTodayRounded";
 import PrintPreviewModal from "./PrintPreviewModal";
 
+function getPageTitle(pathname: string): string {
+  if (pathname === "/" || pathname === "") return "CRM Dashboard";
+  const path = pathname.split("/").filter((x) => x)[0];
+  const titleMap: Record<string, string> = {
+    customers: "Customers",
+    deals: "Deals",
+    contacts: "Contacts",
+    tasks: "Tasks",
+    reports: "Reports",
+    users: "Users",
+    settings: "Settings",
+    chatbot: "Chatbot",
+  };
+  return titleMap[path] || "CRM App";
+}
+
 export default function CrmHeader() {
+  const location = useLocation();
   const [printOpen, setPrintOpen] = React.useState(false);
   const [printContent, setPrintContent] = React.useState<string>("");
-  const [pageTitle, setPageTitle] = React.useState("CRM App");
+  const pageTitle = getPageTitle(location.pathname);
 
   const handlePrintClick = () => {
     const mainContent = document.querySelector("main");
@@ -46,7 +64,7 @@ export default function CrmHeader() {
           component="h1"
           sx={{ fontSize: "34px", fontWeight: 700, lineHeight: "36px" }}
         >
-          <p>CRM App</p>
+          <p>{pageTitle}</p>
         </Typography>
       </Stack>
       <Stack direction="row" sx={{ gap: 1 }}>
