@@ -14,6 +14,8 @@ import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded
 import ContactsRoundedIcon from "@mui/icons-material/ContactsRounded";
 import AssignmentRoundedIcon from "@mui/icons-material/AssignmentRounded";
 import AssessmentRoundedIcon from "@mui/icons-material/AssessmentRounded";
+import SupervisorAccountRoundedIcon from "@mui/icons-material/SupervisorAccountRounded";
+import ChatRoundedIcon from "@mui/icons-material/ChatRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 
@@ -24,6 +26,8 @@ const mainListItems = [
   { text: "Contacts", icon: <ContactsRoundedIcon />, path: "/contacts" },
   { text: "Tasks", icon: <AssignmentRoundedIcon />, path: "/tasks" },
   { text: "Reports", icon: <AssessmentRoundedIcon />, path: "/reports" },
+  { text: "Users", icon: <SupervisorAccountRoundedIcon />, path: "/users" },
+  { text: "Chatbot", icon: <ChatRoundedIcon />, path: "/chatbot" },
 ];
 
 const secondaryListItems = [
