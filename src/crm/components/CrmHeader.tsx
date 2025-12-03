@@ -58,11 +58,26 @@ export default function CrmHeader() {
         >
           This Month
         </Button>
+        <IconButton
+          onClick={handlePrintClick}
+          title="Print Preview"
+          size="small"
+          sx={{ color: "action.active" }}
+        >
+          <PrintIcon />
+        </IconButton>
         <MenuButton showBadge aria-label="Open notifications">
           <NotificationsRoundedIcon />
         </MenuButton>
         <ColorModeIconDropdown />
       </Stack>
+
+      <PrintPreviewModal
+        open={printOpen}
+        onClose={() => setPrintOpen(false)}
+        title={pageTitle}
+        content={<div dangerouslySetInnerHTML={{ __html: printContent }} />}
+      />
     </Stack>
   );
 }
