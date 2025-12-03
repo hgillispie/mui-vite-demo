@@ -99,11 +99,16 @@ export default function UserManagement() {
     setPage(0);
   };
 
-  const getStatusColor = (accountStatus: string): "default" | "warning" | "success" = {
-    Active: "success",
-    Suspended: "warning",
-    Inactive: "default",
-  }[accountStatus] || "default";
+  type ChipColor = "default" | "warning" | "success";
+
+  const getStatusColor = (accountStatus: string): ChipColor => {
+    const colorMap: Record<string, ChipColor> = {
+      Active: "success",
+      Suspended: "warning",
+      Inactive: "default",
+    };
+    return colorMap[accountStatus] || "default";
+  };
 
   const getInitials = (user: User) => {
     return `${user.name.first[0]}${user.name.last[0]}`.toUpperCase();
