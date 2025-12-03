@@ -18,6 +18,7 @@ import Contacts from "./pages/Contacts";
 import Tasks from "./pages/Tasks";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import UserManagement from "./pages/UserManagement";
 import AppTheme from "../shared-theme/AppTheme";
 import {
   chartsCustomizations,
@@ -69,6 +70,7 @@ export default function CrmDashboard() {
               <Route path="tasks" element={<Tasks />} />
               <Route path="reports" element={<Reports />} />
               <Route path="settings" element={<Settings />} />
+              <Route path="users" element={<UserManagement />} />
             </Routes>
             <Outlet />
           </Stack>
