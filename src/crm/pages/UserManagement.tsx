@@ -111,7 +111,14 @@ export default function UserManagement() {
   };
 
   const getInitials = (user: User) => {
-    return `${user.name.first[0]}${user.name.last[0]}`.toUpperCase();
+    const firstInitial = user?.name?.first?.[0] || "U";
+    const lastInitial = user?.name?.last?.[0] || "M";
+    return `${firstInitial}${lastInitial}`.toUpperCase();
+  };
+
+  const getUserId = (user: User) => {
+    if (!user?.uuid) return "N/A";
+    return typeof user.uuid === "string" ? user.uuid.slice(0, 8) : "N/A";
   };
 
   return (
@@ -189,40 +196,48 @@ export default function UserManagement() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.uuid} hover>
-                    <TableCell>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <Avatar src={user.picture.thumbnail} alt={user.name.first}>
-                          {getInitials(user)}
-                        </Avatar>
-                        <Typography variant="body2">
-                          {user.name.first} {user.name.last}
-                        </Typography>
-                      </Stack>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">{user.email}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <LocationOnIcon sx={{ fontSize: 20, opacity: 0.56 }} />
-                        <Typography variant="body2">{user.location.city}</Typography>
-                      </Stack>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label="Active"
-                        size="small"
-                        color={getStatusColor("Active")}
-                        variant="filled"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">{user.uuid.slice(0, 8)}</Typography>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {users.map((user) => {
+                  const key = user?.uuid || `user-${Math.random()}`;
+                  return (
+                    <TableRow key={key} hover>
+                      <TableCell>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <Avatar
+                            src={user?.picture?.thumbnail}
+                            alt={user?.name?.first || "User"}
+                          >
+                            {getInitials(user)}
+                          </Avatar>
+                          <Typography variant="body2">
+                            {user?.name?.first || ""} {user?.name?.last || ""}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">{user?.email || "N/A"}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={0.5} alignItems="center">
+                          <LocationOnIcon sx={{ fontSize: 20, opacity: 0.56 }} />
+                          <Typography variant="body2">
+                            {user?.location?.city || "N/A"}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label="Active"
+                          size="small"
+                          color={getStatusColor("Active")}
+                          variant="filled"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">{getUserId(user)}</Typography>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
               <TableFooter>
                 <TableRow>
