@@ -107,7 +107,7 @@ function CustomerStatCard({ icon, label, value, color }: StatCardProps) {
             {icon}
           </Box>
           <Box>
-            <Typography variant="h5" component="p" fontWeight={600}>
+            <Typography variant="h5" component="p" fontWeight={600} sx={{ color: "rgba(65, 117, 5, 1)" }}>
               {value}
             </Typography>
             <Typography variant="body2" color="text.secondary">
@@ -486,7 +486,7 @@ export default function Customers() {
         sx={{ mb: 3 }}
       >
         <Box>
-          <Typography variant="h5" component="h2" fontWeight={600}>
+          <Typography variant="h5" component="h2" fontWeight={800}>
             Customers
           </Typography>
           <Typography variant="body2" color="text.secondary">
