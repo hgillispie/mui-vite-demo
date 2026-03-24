@@ -1,3 +1,16 @@
+/**
+ * Customers.tsx
+ *
+ * Full-featured Customers dashboard page for the CRM.
+ *
+ * Features:
+ *  - Summary stat cards populated from the Users API (total, countries, avg age, new this month)
+ *  - Searchable, server-side paginated and sortable customer table
+ *  - Edit modal that PUTs updated fields back to the Users API
+ *
+ * Data source: https://user-api.builder-io.workers.dev/api/users
+ */
+
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -38,6 +51,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
+/** Nested location object returned by the Users API. */
 interface UserLocation {
   city: string;
   state: string;
@@ -48,6 +62,11 @@ interface UserLocation {
   timezone: { offset: string; description: string };
 }
 
+/**
+ * Full user record as returned by GET /api/users and GET /api/users/:id.
+ * All nested objects mirror the API response shape exactly so they can be
+ * spread directly into PUT request bodies.
+ */
 interface User {
   login: { uuid: string; username: string; password: string };
   name: { title: string; first: string; last: string };
@@ -62,6 +81,7 @@ interface User {
   nat: string;
 }
 
+/** Paginated response envelope from GET /api/users. */
 interface ApiResponse {
   page: number;
   perPage: number;
@@ -69,6 +89,10 @@ interface ApiResponse {
   data: User[];
 }
 
+/**
+ * Dot-notation field names accepted by the API's `sortBy` query parameter.
+ * Only these values are valid — the API will ignore unknown sort fields.
+ */
 type SortField =
   | "name.first"
   | "name.last"
@@ -79,18 +103,34 @@ type SortField =
 
 // ─── Stat Card ───────────────────────────────────────────────────────────────
 
+/** Props for the small summary metric cards shown at the top of the page. */
 interface StatCardProps {
+  /** MUI icon element rendered inside the colored square. */
   icon: React.ReactNode;
+  /** Human-readable metric label shown below the value. */
   label: string;
+  /** Metric value — either a pre-formatted string or a raw number. */
   value: string | number;
+  /**
+   * MUI palette key used to tint the icon background and icon color.
+   * e.g. "primary", "info", "warning", "success"
+   */
   color: string;
 }
 
+/**
+ * CustomerStatCard
+ *
+ * A compact card that displays a single KPI metric with a colored icon,
+ * a prominent numeric value, and a descriptive label underneath.
+ * Used in the top summary row of the Customers dashboard.
+ */
 function CustomerStatCard({ icon, label, value, color }: StatCardProps) {
   return (
     <Card variant="outlined" sx={{ height: "100%" }}>
       <CardContent>
         <Stack direction="row" spacing={2} alignItems="center">
+          {/* Colored icon badge — background tint + icon color both derive from the `color` prop */}
           <Box
             sx={{
               width: 48,
@@ -106,10 +146,13 @@ function CustomerStatCard({ icon, label, value, color }: StatCardProps) {
           >
             {icon}
           </Box>
+
           <Box>
+            {/* Primary metric value */}
             <Typography variant="h5" component="p" fontWeight={600} sx={{ color: "rgba(65, 117, 5, 1)" }}>
               {value}
             </Typography>
+            {/* Descriptive label */}
             <Typography variant="body2" color="text.secondary">
               {label}
             </Typography>
@@ -122,22 +165,52 @@ function CustomerStatCard({ icon, label, value, color }: StatCardProps) {
 
 // ─── Edit User Modal ──────────────────────────────────────────────────────────
 
+/** Props for the EditUserModal dialog. */
 interface EditUserModalProps {
+  /** The user record to edit, or null when the modal is closed. */
   user: User | null;
+  /** Controls dialog visibility. */
   open: boolean;
+  /** Called when the user dismisses the dialog without saving. */
   onClose: () => void;
+  /**
+   * Called with the updated user record after a successful PUT request.
+   * The parent uses this to update the table row in place without re-fetching.
+   */
   onSave: (user: User) => void;
 }
 
+/**
+ * EditUserModal
+ *
+ * A full-screen-width dialog that lets staff edit a customer's personal info
+ * and location. On submit it sends a PUT request to the Users API using the
+ * user's UUID as the identifier, then calls `onSave` so the parent table can
+ * update optimistically without a full data re-fetch.
+ *
+ * Form state is managed locally and seeded from the `user` prop whenever
+ * the modal opens (via a useEffect dependency on `user`).
+ */
 function EditUserModal({ user, open, onClose, onSave }: EditUserModalProps) {
+  // Local copy of the user record that the form fields mutate.
   const [formData, setFormData] = React.useState<Partial<User>>({});
+  // True while the PUT request is in-flight — disables the submit button.
   const [saving, setSaving] = React.useState(false);
+  // Non-null when the PUT request fails — shown as an inline Alert.
   const [error, setError] = React.useState<string | null>(null);
 
+  // Seed formData whenever a new user is passed in (i.e. modal is opened).
   React.useEffect(() => {
     if (user) setFormData(user);
   }, [user]);
 
+  /**
+   * Returns a curried onChange handler for a given dot-notation path within
+   * formData. For example, handleFieldChange("name.first") returns a handler
+   * that updates formData.name.first while keeping the rest of the object intact.
+   *
+   * Shallow-clones each level of nesting so React detects the state change.
+   */
   const handleFieldChange =
     (path: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
@@ -148,15 +221,22 @@ function EditUserModal({ user, open, onClose, onSave }: EditUserModalProps) {
           string,
           unknown
         >;
+        // Walk down the path, shallow-cloning each intermediate object.
         for (let i = 0; i < keys.length - 1; i++) {
           current[keys[i]] = { ...(current[keys[i]] as object) };
           current = current[keys[i]] as Record<string, unknown>;
         }
+        // Set the leaf value.
         current[keys[keys.length - 1]] = value;
         return updated;
       });
     };
 
+  /**
+   * Submits the edited formData to PUT /api/users/:uuid.
+   * On success: calls onSave (updates parent table) then closes the modal.
+   * On failure: surfaces an error Alert inside the dialog.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -181,6 +261,11 @@ function EditUserModal({ user, open, onClose, onSave }: EditUserModalProps) {
     }
   };
 
+  /**
+   * Helper to safely read a dot-notation path from formData.
+   * Returns an empty string if any intermediate key is missing,
+   * preventing "Cannot read property of undefined" errors in controlled inputs.
+   */
   const val = (path: string): string => {
     const keys = path.split(".");
     let current: unknown = formData;
@@ -206,13 +291,19 @@ function EditUserModal({ user, open, onClose, onSave }: EditUserModalProps) {
         </Stack>
       </DialogTitle>
       <Divider />
+
+      {/* The dialog body doubles as the <form> so the submit button inside
+          DialogActions can trigger native form validation. */}
       <Box component="form" onSubmit={handleSubmit}>
         <DialogContent>
+          {/* API error feedback */}
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {error}
             </Alert>
           )}
+
+          {/* User identity summary — avatar + display name + username */}
           <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
             <Avatar
               src={formData.picture?.large}
@@ -229,6 +320,7 @@ function EditUserModal({ user, open, onClose, onSave }: EditUserModalProps) {
             </Box>
           </Stack>
 
+          {/* ── Personal Info section ── */}
           <Typography
             variant="overline"
             color="text.secondary"
@@ -286,6 +378,7 @@ function EditUserModal({ user, open, onClose, onSave }: EditUserModalProps) {
             </Grid>
           </Grid>
 
+          {/* ── Location section ── */}
           <Typography
             variant="overline"
             color="text.secondary"
@@ -295,6 +388,7 @@ function EditUserModal({ user, open, onClose, onSave }: EditUserModalProps) {
             Location
           </Typography>
           <Grid container spacing={2}>
+            {/* Street is read-only combined display; only the name portion is editable */}
             <Grid item xs={12}>
               <TextField
                 label="Street"
@@ -342,11 +436,14 @@ function EditUserModal({ user, open, onClose, onSave }: EditUserModalProps) {
             </Grid>
           </Grid>
         </DialogContent>
+
         <Divider />
+
         <DialogActions sx={{ px: 3, py: 2 }}>
           <Button onClick={onClose} variant="outlined" disabled={saving}>
             Cancel
           </Button>
+          {/* Spinner replaces the leading icon while the PUT request is in-flight */}
           <Button
             type="submit"
             variant="contained"
@@ -363,27 +460,54 @@ function EditUserModal({ user, open, onClose, onSave }: EditUserModalProps) {
 
 // ─── Main Customers Page ──────────────────────────────────────────────────────
 
+/** Rows-per-page options exposed in the table pagination control. */
 const ROWS_PER_PAGE_OPTIONS = [10, 25, 50];
 
+/**
+ * Customers
+ *
+ * Top-level page component for the /customers route.
+ *
+ * Responsibilities:
+ *  1. Fetch paginated user data from the Users API, re-fetching whenever
+ *     page, rowsPerPage, sortBy, or debouncedSearch changes.
+ *  2. Derive summary KPIs from the current page of data (countries, avg age,
+ *     new registrations this calendar month).
+ *  3. Render four stat cards, a searchable + sortable table, and an edit modal.
+ *
+ * State overview:
+ *  - users / total        — current page data and total record count from the API
+ *  - loading / fetchError — async fetch lifecycle flags
+ *  - search               — raw value bound to the search TextField (debounced before API call)
+ *  - debouncedSearch      — delayed copy of search, used as the actual API query param
+ *  - page / rowsPerPage   — MUI TablePagination state (0-indexed page)
+ *  - sortBy / sortDir     — column sort state forwarded to the API
+ *  - editUser / editOpen  — which user is being edited and whether the modal is open
+ */
 export default function Customers() {
+  // ── Data state ──────────────────────────────────────────────────────────────
   const [users, setUsers] = React.useState<User[]>([]);
   const [total, setTotal] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [fetchError, setFetchError] = React.useState<string | null>(null);
 
-  // Table state
+  // ── Table / search state ─────────────────────────────────────────────────
   const [search, setSearch] = React.useState("");
+  // Debounced copy of `search` — only updated after the user stops typing for 400 ms.
   const [debouncedSearch, setDebouncedSearch] = React.useState("");
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = React.useState(0); // MUI pagination is 0-indexed
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [sortBy, setSortBy] = React.useState<SortField>("name.first");
   const [sortDir, setSortDir] = React.useState<"asc" | "desc">("asc");
 
-  // Edit modal state
+  // ── Edit modal state ─────────────────────────────────────────────────────
   const [editUser, setEditUser] = React.useState<User | null>(null);
   const [editOpen, setEditOpen] = React.useState(false);
 
-  // Debounce search
+  // ── Search debounce ──────────────────────────────────────────────────────
+  // Waits 400 ms after the last keystroke before updating debouncedSearch,
+  // which in turn triggers the API fetch effect. Also resets to page 0 so
+  // search results always start from the beginning.
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -392,7 +516,9 @@ export default function Customers() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Fetch users from API
+  // ── Data fetch ───────────────────────────────────────────────────────────
+  // Re-runs whenever pagination, sort, or search changes.
+  // The API page parameter is 1-indexed, so we add 1 to MUI's 0-indexed page.
   React.useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
@@ -410,7 +536,7 @@ export default function Customers() {
         if (!res.ok) throw new Error("Failed to fetch users");
         const json: ApiResponse = await res.json();
         setUsers(json.data);
-        setTotal(json.total);
+        setTotal(json.total); // total drives TablePagination's count prop
       } catch {
         setFetchError("Could not load customers. Please try again.");
       } finally {
@@ -420,6 +546,9 @@ export default function Customers() {
     fetchUsers();
   }, [page, rowsPerPage, sortBy, debouncedSearch]);
 
+  // ── Sort handler ─────────────────────────────────────────────────────────
+  // Clicking an already-active column header flips the direction;
+  // clicking a new column defaults to ascending and resets to page 0.
   const handleSort = (field: SortField) => {
     if (sortBy === field) {
       setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -430,6 +559,7 @@ export default function Customers() {
     setPage(0);
   };
 
+  // ── Edit modal handlers ──────────────────────────────────────────────────
   const handleEditOpen = (user: User) => {
     setEditUser(user);
     setEditOpen(true);
@@ -440,6 +570,10 @@ export default function Customers() {
     setEditUser(null);
   };
 
+  /**
+   * Optimistically updates the matching row in the local `users` array after
+   * a successful PUT, avoiding a full re-fetch just to reflect the edit.
+   */
   const handleEditSave = (updated: User) => {
     setUsers((prev) =>
       prev.map((u) =>
@@ -448,6 +582,7 @@ export default function Customers() {
     );
   };
 
+  /** Formats an ISO date string to a locale-friendly "Jan 1, 2024" format. */
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -455,16 +590,25 @@ export default function Customers() {
       day: "numeric",
     });
 
+  // ── Derived stats (computed from current page of users) ──────────────────
+
+  /** Number of distinct countries in the current page of results. */
   const uniqueCountries = React.useMemo(
     () => new Set(users.map((u) => u.location.country)).size,
     [users],
   );
 
+  /** Mean age across users on the current page, rounded to the nearest integer. */
   const avgAge = React.useMemo(() => {
     if (!users.length) return 0;
     return Math.round(users.reduce((sum, u) => sum + u.dob.age, 0) / users.length);
   }, [users]);
 
+  /**
+   * Count of users whose registration date falls within the current calendar
+   * month and year. Note: this reflects only the current page of results,
+   * not the full dataset.
+   */
   const newThisMonth = React.useMemo(() => {
     const now = new Date();
     return users.filter((u) => {
@@ -476,9 +620,11 @@ export default function Customers() {
     }).length;
   }, [users]);
 
+  // ── Render ───────────────────────────────────────────────────────────────
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
-      {/* Page header */}
+
+      {/* ── Page header ── */}
       <Stack
         direction="row"
         justifyContent="space-between"
@@ -495,7 +641,8 @@ export default function Customers() {
         </Box>
       </Stack>
 
-      {/* Stat Cards */}
+      {/* ── Summary stat cards ──
+          Values are pulled from the API response; "…" is shown while loading. */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} lg={3}>
           <CustomerStatCard
@@ -531,9 +678,10 @@ export default function Customers() {
         </Grid>
       </Grid>
 
-      {/* Search + Table */}
+      {/* ── Customer table card ── */}
       <Card variant="outlined">
         <CardContent sx={{ pb: 0 }}>
+          {/* Table toolbar: title on the left, search field on the right */}
           <Stack
             direction={{ xs: "column", sm: "row" }}
             justifyContent="space-between"
@@ -544,6 +692,8 @@ export default function Customers() {
             <Typography variant="h6" component="h3">
               Customer List
             </Typography>
+            {/* Controlled search input — updates `search` state on every keystroke;
+                the debounce effect delays the actual API call by 400 ms. */}
             <TextField
               placeholder="Search by name, email or city…"
               size="small"
@@ -563,6 +713,7 @@ export default function Customers() {
           </Stack>
         </CardContent>
 
+        {/* API-level error banner (shown when the fetch itself fails) */}
         {fetchError && (
           <Alert severity="error" sx={{ mx: 2, mb: 2 }}>
             {fetchError}
@@ -573,8 +724,12 @@ export default function Customers() {
           <Table size="small" aria-label="customers table">
             <TableHead>
               <TableRow>
+                {/* Non-sortable columns */}
                 <TableCell>Customer</TableCell>
                 <TableCell>Email</TableCell>
+
+                {/* Sortable columns — each wraps its label in a TableSortLabel
+                    that shows the active sort direction arrow. */}
                 <TableCell>
                   <TableSortLabel
                     active={sortBy === "location.city"}
@@ -619,9 +774,12 @@ export default function Customers() {
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
               {loading
-                ? Array.from({ length: rowsPerPage }).map((_, i) => (
+                ? /* ── Skeleton rows shown while data loads ──
+                     One skeleton row per rowsPerPage entry keeps layout stable. */
+                  Array.from({ length: rowsPerPage }).map((_, i) => (
                     <TableRow key={i}>
                       <TableCell>
                         <Stack direction="row" spacing={1} alignItems="center">
@@ -652,8 +810,10 @@ export default function Customers() {
                       </TableCell>
                     </TableRow>
                   ))
-                : users.map((user) => (
+                : /* ── Data rows ── */
+                  users.map((user) => (
                     <TableRow key={user.login.uuid} hover>
+                      {/* Avatar + full name + username */}
                       <TableCell>
                         <Stack
                           direction="row"
@@ -683,13 +843,17 @@ export default function Customers() {
                           </Box>
                         </Stack>
                       </TableCell>
+
                       <TableCell>
                         <Typography variant="body2">{user.email}</Typography>
                       </TableCell>
+
                       <TableCell>{user.location.city}</TableCell>
                       <TableCell>{user.location.country}</TableCell>
                       <TableCell align="right">{user.dob.age}</TableCell>
                       <TableCell>{formatDate(user.registered.date)}</TableCell>
+
+                      {/* Gender chip — "info" for male, "secondary" for female */}
                       <TableCell align="center">
                         <Chip
                           label={
@@ -703,6 +867,8 @@ export default function Customers() {
                           variant="outlined"
                         />
                       </TableCell>
+
+                      {/* Row action buttons: edit opens the modal, delete is wired up separately */}
                       <TableCell align="right">
                         <Stack
                           direction="row"
@@ -731,6 +897,8 @@ export default function Customers() {
           </Table>
         </TableContainer>
 
+        {/* Server-side pagination — `count` is the total from the API so MUI
+            can correctly calculate the number of pages without loading all data. */}
         <TablePagination
           component="div"
           count={total}
@@ -740,12 +908,13 @@ export default function Customers() {
           onPageChange={(_, newPage) => setPage(newPage)}
           onRowsPerPageChange={(e) => {
             setRowsPerPage(parseInt(e.target.value, 10));
-            setPage(0);
+            setPage(0); // reset to first page when page size changes
           }}
         />
       </Card>
 
-      {/* Edit User Modal */}
+      {/* Edit User Modal — rendered here (at page level) so it sits above the
+          table in the stacking context and doesn't inherit table scroll overflow. */}
       <EditUserModal
         user={editUser}
         open={editOpen}
